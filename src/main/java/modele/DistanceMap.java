@@ -11,7 +11,11 @@ public class DistanceMap {
     }
 
     public int getDistance(String from, String to) {
-        return distances.getOrDefault(from, new HashMap<>()).getOrDefault(to, Integer.MAX_VALUE);
+        if (!distances.containsKey(from) || !distances.get(from).containsKey(to)) {
+            System.err.println("⚠️ Distance inconnue entre " + from + " et " + to);
+            return Integer.MAX_VALUE;
+        }
+        return distances.get(from).get(to);
     }
 
     public Map<String, Integer> getNeighbours(String from) {

@@ -1,8 +1,9 @@
 package console;
 
-import modele.Membre;
-import modele.Vente;
+import modele.AlgoBase;
+import modele.AlgoHeuristique;
 import modele.DistanceMap;
+import modele.Vente;
 
 import java.io.*;
 import java.util.*;
@@ -10,12 +11,19 @@ import java.util.*;
 public class ConsoleLauncher {
 
     private static final String REPERTOIRE_SCENARIOS = "scenarios/";
-    private static final String REPERTOIRE_RESSOURCES = "ressources_appli/";
-    private static final String FICHIER_MEMBRES = "membres_APPLI.txt";
-    private static final String FICHIER_DISTANCES = "distances.txt";
+    private static final String FICHIER_MEMBRES = "ressources_appli/membres_APPLI.txt";
+    private static final String FICHIER_DISTANCES = "ressources_appli/distances.txt";
 
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
+
+        // Choix de l'algorithme
+        System.out.println("Choisissez l'algorithme à exécuter :");
+        System.out.println("1 - Algo de base");
+        System.out.println("2 - Algo heuristique");
+        System.out.print("Votre choix : ");
+        int algoChoisi = scanner.nextInt();
+        scanner.nextLine(); // consomme le retour à la ligne
 
         // Liste les scénarios disponibles
         File dossierScenarios = new File(REPERTOIRE_SCENARIOS);
@@ -25,41 +33,40 @@ public class ConsoleLauncher {
             return;
         }
 
-        System.out.println("Scénarios disponibles :");
+        System.out.println("\nScénarios disponibles :");
         for (int i = 0; i < fichiers.length; i++) {
             System.out.println(i + " - " + fichiers[i].getName());
         }
 
         System.out.print("Entrez le numéro du scénario à charger : ");
         int choix = scanner.nextInt();
-        String nomFichier = fichiers[choix].getName();
+        scanner.nextLine();
 
-        Map<String, String> pseudoToVille = chargerMembres(REPERTOIRE_RESSOURCES + FICHIER_MEMBRES);
-        List<Vente> ventes = chargerVentes(REPERTOIRE_SCENARIOS + nomFichier);
-        DistanceMap distances = chargerDistances(REPERTOIRE_RESSOURCES + FICHIER_DISTANCES);
-
-        List<String> parcours = new ArrayList<>();
-        Set<String> dejaVisitees = new HashSet<>();
-
-        parcours.add("Vélizy");
-        dejaVisitees.add("Vélizy");
-
-        for (Vente v : ventes) {
-            String villeVendeur = pseudoToVille.get(v.getVendeur());
-            String villeAcheteur = pseudoToVille.get(v.getAcheteur());
-
-            if (!dejaVisitees.contains(villeVendeur)) {
-                parcours.add(villeVendeur);
-                dejaVisitees.add(villeVendeur);
-            }
-            if (!dejaVisitees.contains(villeAcheteur)) {
-                parcours.add(villeAcheteur);
-                dejaVisitees.add(villeAcheteur);
-            }
+        if (choix < 0 || choix >= fichiers.length) {
+            System.out.println("Numéro de scénario invalide.");
+            return;
         }
 
-        parcours.add("Vélizy");
+        String nomFichier = fichiers[choix].getName();
 
+        // Chargement des données
+        Map<String, String> pseudoToVille = chargerMembres(FICHIER_MEMBRES);
+        List<Vente> ventes = chargerVentes(REPERTOIRE_SCENARIOS + nomFichier);
+        DistanceMap distances = chargerDistances(FICHIER_DISTANCES);
+
+        // Calcul de l’itinéraire selon l’algo choisi
+        List<String> parcours;
+        String nomAlgo;
+
+        if (algoChoisi == 1) {
+            parcours = AlgoBase.calculerItineraire(ventes, pseudoToVille);
+            nomAlgo = "Algorithme de base";
+        } else {
+            parcours = AlgoHeuristique.calculerItineraire(ventes, pseudoToVille, distances);
+            nomAlgo = "Algorithme heuristique";
+        }
+
+        // Calcul de la distance totale
         int total = 0;
         for (int i = 0; i < parcours.size() - 1; i++) {
             String from = parcours.get(i);
@@ -67,12 +74,14 @@ public class ConsoleLauncher {
             total += distances.getDistance(from, to);
         }
 
-        System.out.println("\n🧭 Itinéraire généré :");
+        // Affichage du résultat
+        System.out.println("\nAlgorithme utilisé : " + nomAlgo);
+        System.out.println("Itinéraire généré :");
         for (String ville : parcours) {
             System.out.println(" - " + ville);
         }
 
-        System.out.println("\n🧾 Distance totale : " + total + " km");
+        System.out.println("\nDistance totale : " + total + " km");
     }
 
     private static Map<String, String> chargerMembres(String chemin) throws IOException {
@@ -114,8 +123,8 @@ public class ConsoleLauncher {
             villes.add(l.split("\\s+")[0]);
         }
 
-        for (int i = 0; i < lignes.size(); i++) {
-            String[] parts = lignes.get(i).trim().split("\\s+");
+        for (String ligne : lignes) {
+            String[] parts = ligne.trim().split("\\s+");
             String villeA = parts[0];
             for (int j = 1; j < parts.length; j++) {
                 String villeB = villes.get(j - 1);
