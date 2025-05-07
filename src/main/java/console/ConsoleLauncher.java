@@ -1,6 +1,5 @@
 package console;
 
-import modele.Membre;
 import modele.Vente;
 import modele.DistanceMap;
 
@@ -10,9 +9,6 @@ import java.util.*;
 public class ConsoleLauncher {
 
     private static final String REPERTOIRE_SCENARIOS = "scenarios/";
-    private static final String REPERTOIRE_RESSOURCES = "ressources_appli/";
-    private static final String FICHIER_MEMBRES = "membres_APPLI.txt";
-    private static final String FICHIER_DISTANCES = "distances.txt";
 
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
@@ -34,9 +30,9 @@ public class ConsoleLauncher {
         int choix = scanner.nextInt();
         String nomFichier = fichiers[choix].getName();
 
-        Map<String, String> pseudoToVille = chargerMembres(REPERTOIRE_RESSOURCES + FICHIER_MEMBRES);
+        Map<String, String> pseudoToVille = chargerMembres();
         List<Vente> ventes = chargerVentes(REPERTOIRE_SCENARIOS + nomFichier);
-        DistanceMap distances = chargerDistances(REPERTOIRE_RESSOURCES + FICHIER_DISTANCES);
+        DistanceMap distances = chargerDistances();
 
         List<String> parcours = new ArrayList<>();
         Set<String> dejaVisitees = new HashSet<>();
@@ -67,17 +63,17 @@ public class ConsoleLauncher {
             total += distances.getDistance(from, to);
         }
 
-        System.out.println("\n🧭 Itinéraire généré :");
+        System.out.println("\nItinéraire généré :");
         for (String ville : parcours) {
             System.out.println(" - " + ville);
         }
 
-        System.out.println("\n🧾 Distance totale : " + total + " km");
+        System.out.println("\nDistance totale : " + total + " km");
     }
 
-    private static Map<String, String> chargerMembres(String chemin) throws IOException {
+    private static Map<String, String> chargerMembres() throws IOException {
         Map<String, String> map = new HashMap<>();
-        BufferedReader reader = new BufferedReader(new FileReader(chemin));
+        BufferedReader reader = new BufferedReader(new FileReader("ressources_appli/membres_APPLI.txt"));
         String line;
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(" ");
@@ -99,10 +95,10 @@ public class ConsoleLauncher {
         return list;
     }
 
-    private static DistanceMap chargerDistances(String chemin) throws IOException {
+    private static DistanceMap chargerDistances() throws IOException {
         DistanceMap distMap = new DistanceMap();
         List<String> lignes = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new FileReader(chemin));
+        BufferedReader reader = new BufferedReader(new FileReader("ressources_appli/distances.txt"));
         String line;
         while ((line = reader.readLine()) != null) {
             lignes.add(line);
@@ -114,8 +110,8 @@ public class ConsoleLauncher {
             villes.add(l.split("\\s+")[0]);
         }
 
-        for (int i = 0; i < lignes.size(); i++) {
-            String[] parts = lignes.get(i).trim().split("\\s+");
+        for (String ligne : lignes) {
+            String[] parts = ligne.trim().split("\\s+");
             String villeA = parts[0];
             for (int j = 1; j < parts.length; j++) {
                 String villeB = villes.get(j - 1);
