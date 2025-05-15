@@ -6,10 +6,12 @@ public class AlgoHeuristique {
 
     /**
      * Calcule un itinéraire heuristique à partir des ventes et distances.
-     * @param ventes liste des ventes (vendeur → acheteur)
-     * @param pseudoToVille map des pseudonymes vers villes
-     * @param distances matrice des distances entre villes
-     * @return liste ordonnée des villes à visiter (début et fin à Vélizy)
+     * Si toutes les contraintes sont bloquées, choisit la ville atteignable la plus proche.
+     *
+     * @param ventes         liste des ventes (vendeur → acheteur)
+     * @param pseudoToVille  map des pseudonymes vers villes
+     * @param distances      matrice des distances entre villes
+     * @return liste ordonnée des villes à visiter (début et fin à Velizy)
      */
     public static List<String> calculerItineraire(List<Vente> ventes, Map<String, String> pseudoToVille, DistanceMap distances) {
 
@@ -18,6 +20,7 @@ public class AlgoHeuristique {
         Set<String> villesVisitees = new HashSet<>();
         List<String> parcours = new ArrayList<>();
 
+        // Construction des dépendances : acheteur -> vendeurs
         for (Vente v : ventes) {
             String villeVendeur = pseudoToVille.get(v.getVendeur());
             String villeAcheteur = pseudoToVille.get(v.getAcheteur());
@@ -28,7 +31,7 @@ public class AlgoHeuristique {
             dependances.computeIfAbsent(villeAcheteur, k -> new ArrayList<>()).add(villeVendeur);
         }
 
-        String villeActuelle = "Vélizy";
+        String villeActuelle = "Velizy";
         parcours.add(villeActuelle);
         villesVisitees.add(villeActuelle);
 
@@ -36,6 +39,7 @@ public class AlgoHeuristique {
             String prochain = null;
             int distanceMin = Integer.MAX_VALUE;
 
+            // villes respectant les contraintes
             for (String ville : villesARendre) {
                 if (villesVisitees.contains(ville)) continue;
 
@@ -58,12 +62,27 @@ public class AlgoHeuristique {
                 }
             }
 
+            // plan B si tout est bloqué
+            if (prochain == null) {
+                System.err.println("Aucune ville atteignable sans violer les contraintes. Forçage activé.");
+
+                for (String ville : villesARendre) {
+                    if (villesVisitees.contains(ville)) continue;
+
+                    int dist = distances.getDistance(villeActuelle, ville);
+                    if (dist < distanceMin) {
+                        distanceMin = dist;
+                        prochain = ville;
+                    }
+                }
+            }
+
             if (prochain != null) {
                 parcours.add(prochain);
                 villesVisitees.add(prochain);
                 villeActuelle = prochain;
             } else {
-                System.err.println("Erreur : blocage heuristique.");
+                System.err.println("Erreur critique : aucune ville atteignable, même avec forçage.");
                 System.err.println("Villes restantes non atteignables :");
                 for (String ville : villesARendre) {
                     if (!villesVisitees.contains(ville)) {
@@ -76,10 +95,9 @@ public class AlgoHeuristique {
                 }
                 break;
             }
-
         }
 
-        parcours.add("Vélizy");
+        parcours.add("Velizy");
         return parcours;
     }
 }
