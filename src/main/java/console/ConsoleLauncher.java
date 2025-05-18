@@ -23,7 +23,7 @@ public class ConsoleLauncher {
         System.out.println("2 - Algo heuristique");
         System.out.print("Votre choix : ");
         int algoChoisi = scanner.nextInt();
-        scanner.nextLine(); // consomme le retour à la ligne
+        scanner.nextLine();
 
         // Liste les scénarios disponibles
         File dossierScenarios = new File(REPERTOIRE_SCENARIOS);

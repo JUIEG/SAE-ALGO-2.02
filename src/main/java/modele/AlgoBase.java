@@ -5,87 +5,83 @@ import java.util.*;
 public class AlgoBase {
 
     public static List<String> calculerItineraire(List<Vente> ventes, Map<String, String> pseudoToVille) {
-        Set<String> actions = new HashSet<>();
+        Set<String> villes = new HashSet<>();
         Map<String, Set<String>> graph = new HashMap<>();
-        Map<String, Integer> inDegrees = new HashMap<>();
+        Map<String, Integer> inDegree = new HashMap<>();
 
-        Set<String> villesImpliquées = new HashSet<>();
-        for (Vente v : ventes) {
-            villesImpliquées.add(pseudoToVille.get(v.getVendeur()));
-            villesImpliquées.add(pseudoToVille.get(v.getAcheteur()));
-        }
-
-        // Génère toutes les actions A+ et A-
-        for (String ville : villesImpliquées) {
-            actions.add(ville + "+");
-            actions.add(ville + "-");
-        }
-
-        // Contraintes de base
-        for (String ville : villesImpliquées) {
-            addEdge(graph, "Velizy+", ville + "+");
-            addEdge(graph, ville + "+", ville + "-");
-            addEdge(graph, ville + "-", "Velizy-");
-        }
-
-        // Contraintes liées aux ventes
+        // Étape 1 : récupérer toutes les villes impliquées
         for (Vente v : ventes) {
             String vendeur = pseudoToVille.get(v.getVendeur());
             String acheteur = pseudoToVille.get(v.getAcheteur());
-            addEdge(graph, vendeur + "+", acheteur + "-");
+            villes.add(vendeur);
+            villes.add(acheteur);
         }
 
-        // Calcul des degrés entrants
-        for (String action : graph.keySet()) {
-            inDegrees.putIfAbsent(action, 0);
-            for (String cible : graph.get(action)) {
-                inDegrees.put(cible, inDegrees.getOrDefault(cible, 0) + 1);
+        // Étape 2 : construire les nœuds A+ et A- pour chaque ville
+        for (String ville : villes) {
+            String collect = ville + "+";
+            String deliver = ville + "-";
+
+            addEdge(graph, collect, deliver);
+            addEdge(graph, "Velizy+", collect);
+            addEdge(graph, deliver, "Velizy-");
+
+            inDegree.putIfAbsent(collect, 0);
+            inDegree.putIfAbsent(deliver, 0);
+        }
+
+        // Étape 3 : ajouter les contraintes des ventes
+        for (Vente v : ventes) {
+            String vendeur = pseudoToVille.get(v.getVendeur()) + "+";
+            String acheteur = pseudoToVille.get(v.getAcheteur()) + "-";
+            addEdge(graph, vendeur, acheteur);
+        }
+
+        // Étape 4 : calcul des degrés entrants
+        for (String from : graph.keySet()) {
+            for (String to : graph.get(from)) {
+                inDegree.put(to, inDegree.getOrDefault(to, 0) + 1);
             }
         }
 
-        // Tri topologique (Kahn)
-        Queue<String> file = new LinkedList<>();
+        // Étape 5 : tri topologique hybride FIFO + ordre alphabétique
         List<String> ordre = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Map<String, Integer> insertionIndex = new HashMap<>();
+        int index = 0;
 
-        for (String action : actions) {
-            if (inDegrees.getOrDefault(action, 0) == 0) {
-                file.add(action);
-            }
-        }
-        file.add("Velizy+");
+        PriorityQueue<ActionPrioritaire> queue = new PriorityQueue<>();
+        insertionIndex.put("Velizy+", index);
+        queue.add(new ActionPrioritaire("Velizy+", index++));
 
-        Set<String> vus = new HashSet<>();
-        while (!file.isEmpty()) {
-            String current = file.poll();
-            if (vus.contains(current)) continue;
-            vus.add(current);
+        while (!queue.isEmpty()) {
+            ActionPrioritaire currentAction = queue.poll();
+            String current = currentAction.nom;
+
+            if (visited.contains(current)) continue;
+            visited.add(current);
             ordre.add(current);
 
-            for (String voisin : graph.getOrDefault(current, new HashSet<>())) {
-                inDegrees.put(voisin, inDegrees.get(voisin) - 1);
-                if (inDegrees.get(voisin) == 0) {
-                    file.add(voisin);
+            for (String next : graph.getOrDefault(current, Set.of())) {
+                inDegree.put(next, inDegree.get(next) - 1);
+                if (inDegree.get(next) == 0 && !insertionIndex.containsKey(next)) {
+                    insertionIndex.put(next, index);
+                    queue.add(new ActionPrioritaire(next, index++));
                 }
             }
         }
 
-        // Génère la liste des villes à visiter dans l’ordre
+        ordre.add("Velizy-");
+
+        // Étape 6 : extraire la séquence de villes (sans doublons inutiles)
         List<String> parcours = new ArrayList<>();
-        String derniereVille = null;
+        String lastVille = null;
+
         for (String action : ordre) {
-            if (action.equals("Velizy+")) {
-                parcours.add("Velizy");
-                derniereVille = "Velizy";
-            } else if (action.equals("Velizy-")) {
-                if (!"Velizy".equals(derniereVille)) {
-                    parcours.add("Velizy");
-                }
-            } else {
-                String ville = action.substring(0, action.length() - 1);
-                if (!ville.equals(derniereVille)) {
-                    parcours.add(ville);
-                    derniereVille = ville;
-                }
+            String ville = action.replace("+", "").replace("-", "");
+            if (!ville.equals(lastVille)) {
+                parcours.add(ville);
+                lastVille = ville;
             }
         }
 
@@ -94,5 +90,23 @@ public class AlgoBase {
 
     private static void addEdge(Map<String, Set<String>> graph, String from, String to) {
         graph.computeIfAbsent(from, k -> new HashSet<>()).add(to);
+    }
+
+    private static class ActionPrioritaire implements Comparable<ActionPrioritaire> {
+        String nom;
+        int ordreArrivee;
+
+        public ActionPrioritaire(String nom, int ordreArrivee) {
+            this.nom = nom;
+            this.ordreArrivee = ordreArrivee;
+        }
+
+        @Override
+        public int compareTo(ActionPrioritaire other) {
+            if (this.ordreArrivee != other.ordreArrivee) {
+                return Integer.compare(this.ordreArrivee, other.ordreArrivee);
+            }
+            return this.nom.compareTo(other.nom);  // ordre alphabétique
+        }
     }
 }
