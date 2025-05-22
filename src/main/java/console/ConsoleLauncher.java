@@ -23,9 +23,9 @@ public class ConsoleLauncher {
         System.out.println("2 - Algo heuristique");
         System.out.print("Votre choix : ");
         int algoChoisi = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine(); // consomme le retour à la ligne
 
-        // Liste les scénarios disponibles
+        // Liste des scénarios
         File dossierScenarios = new File(REPERTOIRE_SCENARIOS);
         File[] fichiers = dossierScenarios.listFiles((dir, name) -> name.endsWith(".txt"));
         if (fichiers == null || fichiers.length == 0) {
@@ -49,12 +49,26 @@ public class ConsoleLauncher {
 
         String nomFichier = fichiers[choix].getName();
 
+        // Méthode greedy si algo heuristique
+        int methodeGreedy = 1;
+        if (algoChoisi == 2) {
+            System.out.println("\nMéthodes greedy disponibles :");
+            System.out.println("1 - Ville la plus proche");
+            System.out.println("2 - Ville la plus éloignée");
+            System.out.println("3 - Ordre alphabétique");
+            System.out.println("4 - Ville débloquant le plus de dépendances");
+            System.out.println("5 - Ville la moins visitée historiquement");
+            System.out.print("Votre choix : ");
+            methodeGreedy = scanner.nextInt();
+            scanner.nextLine();
+        }
+
         // Chargement des données
         Map<String, String> pseudoToVille = chargerMembres(FICHIER_MEMBRES);
         List<Vente> ventes = chargerVentes(REPERTOIRE_SCENARIOS + nomFichier);
         DistanceMap distances = chargerDistances(FICHIER_DISTANCES);
 
-        // Calcul de l’itinéraire selon l’algo choisi
+        // Exécution
         List<String> parcours;
         String nomAlgo;
 
@@ -62,11 +76,11 @@ public class ConsoleLauncher {
             parcours = AlgoBase.calculerItineraire(ventes, pseudoToVille);
             nomAlgo = "Algorithme de base";
         } else {
-            parcours = AlgoHeuristique.calculerItineraire(ventes, pseudoToVille, distances);
+            parcours = AlgoHeuristique.calculerItineraire(ventes, pseudoToVille, distances, methodeGreedy);
             nomAlgo = "Algorithme heuristique";
         }
 
-        // Calcul de la distance totale
+        // Distance totale
         int total = 0;
         for (int i = 0; i < parcours.size() - 1; i++) {
             String from = parcours.get(i);
@@ -74,7 +88,7 @@ public class ConsoleLauncher {
             total += distances.getDistance(from, to);
         }
 
-        // Affichage du résultat
+        // Résultat
         System.out.println("\nAlgorithme utilisé : " + nomAlgo);
         System.out.println("Itinéraire généré :");
         for (String ville : parcours) {
@@ -123,8 +137,8 @@ public class ConsoleLauncher {
             villes.add(l.split("\\s+")[0]);
         }
 
-        for (String ligne : lignes) {
-            String[] parts = ligne.trim().split("\\s+");
+        for (int i = 0; i < lignes.size(); i++) {
+            String[] parts = lignes.get(i).trim().split("\\s+");
             String villeA = parts[0];
             for (int j = 1; j < parts.length; j++) {
                 String villeB = villes.get(j - 1);

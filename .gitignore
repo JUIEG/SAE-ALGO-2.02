@@ -31,4 +31,7 @@ bin/
 /target
 /.idea
 /.mvn
+target/classes/modele
+target/classes/module-info.class
+target/classes/modele/DistanceMap.class
 /target
