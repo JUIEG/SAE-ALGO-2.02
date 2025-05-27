@@ -12,7 +12,7 @@ public class DistanceMap {
 
     public int getDistance(String from, String to) {
         if (!distances.containsKey(from) || !distances.get(from).containsKey(to)) {
-            System.err.println("⚠️ Distance inconnue entre " + from + " et " + to);
+            System.err.println("Distance inconnue entre " + from + " et " + to);
             return Integer.MAX_VALUE;
         }
         return distances.get(from).get(to);
