@@ -1,0 +1,23 @@
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 10;
+    -fx-background-color: #f4f4f4;
+}
+
+.menu-button, .combo-box, .text-field, .button {
+    -fx-font-size: 14px;
+    -fx-padding: 6px;
+}
+
+.label {
+    -fx-font-size: 16px;
+}
+
+.table-view {
+    -fx-font-size: 13px;
+    -fx-pref-height: 400px;
+}
+
+.hbox, .vbox {
+    -fx-spacing: 10;
+}

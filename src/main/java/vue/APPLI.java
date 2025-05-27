@@ -1,21 +1,21 @@
 package vue;
 
 import javafx.application.Application;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class APPLI {
+public class APPLI extends Application {
+
+    @Override
+    public void start(Stage stage) {
+        VBoxRoot root = new VBoxRoot();
+        Scene scene = new Scene(root, 800, 600);
+        stage.setScene(scene);
+        stage.setTitle("Optimisation de Parcours");
+        stage.show();
+    }
 
     public static void main(String[] args) {
-        Application.launch(args);}
-
-    private void ouvrirAffichage(Stage stage) {
-        Stage stage1 = new Stage();
-        Scene scene = new Scene();
-
-        stage.setScene(scene);
-        stage.setTitle("APPLI");
-        stage.show();
+        launch(args);
     }
 }
