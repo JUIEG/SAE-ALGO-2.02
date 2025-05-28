@@ -1,5 +1,6 @@
 package vue;
 
+import controleur.ControleurAppli;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -10,14 +11,13 @@ public class MenuAlgoScenario extends HBox {
     private final ComboBox<String> algoCombo = new ComboBox<>();
     private final ComboBox<String> methodeGreedyCombo = new ComboBox<>();
     private final TextField kField = new TextField();
-    Button valider = new Button("Valider");
 
     public MenuAlgoScenario() {
         this.setSpacing(10);
         this.setPadding(new Insets(10));
 
         scenarioCombo.getItems().addAll("scenario_0", "scenario_1", "scenario_2");
-        scenarioCombo.setPromptText("Scénario");
+        scenarioCombo.setPromptText("Scénarios");
 
         algoCombo.getItems().addAll("Algo de base", "Algo heuristique", "K possibilités");
         algoCombo.setPromptText("Algorithme");
@@ -40,14 +40,16 @@ public class MenuAlgoScenario extends HBox {
             kField.setVisible("K possibilités".equals(selected));
         });
 
+        Button valider = new Button("Valider");
+        valider.setId("Valider");
+
+        valider.setOnAction(new ControleurAppli());
+
         this.getChildren().addAll(scenarioCombo, algoCombo, methodeGreedyCombo, kField, valider);
     }
 
-    public Button getValiderButton() {
-        return valider;
-    }
     public String getScenario() {return scenarioCombo.getValue();}
     public String getAlgo() {return algoCombo.getValue();}
-    public int getGreedyIndex(){return Integer.parseInt(methodeGreedyCombo.getValue());}
-    public int getK() {return Integer.parseInt(kField.getText());}
+    public String getGreedyIndex(){return methodeGreedyCombo.getValue();}
+    public String getK() {return kField.getText();}
 }
