@@ -12,7 +12,7 @@ Les données utilisées sont :
 
 Le but est d’implémenter un algorithme capable de générer les k itinéraires les plus courts, valides selon ces contraintes.
 
----
+
 
 ## Classes principales
 
@@ -20,7 +20,7 @@ Le but est d’implémenter un algorithme capable de générer les k itinéraire
 
 La classe `AlgoBase` est la classe de base fournissant des fonctionnalités communes à tous les algorithmes de recherche d’itinéraires. Elle offre notamment des méthodes pour vérifier les contraintes de livraison, calculer la distance totale d’un parcours, et générer des permutations possibles. 
 
----
+
 
 ### Classe AlgoKpossibilite
 
@@ -39,7 +39,7 @@ La classe `AlgoKpossibilite` implémente la recherche des k meilleurs parcours v
 - Le parcours utilise un ensemble `visited` pour éviter les visites répétées de villes.
 - Les contraintes sont vérifiées à chaque étape pour garantir la validité du chemin.
 
----
+
 
 ### Classe Util
 
@@ -56,7 +56,6 @@ La classe `Util` fournit des méthodes utilitaires pour charger les données dep
 
 Cette classe centralise la gestion des données, permettant d’isoler la lecture des fichiers et de préparer les données sous forme exploitable pour les algorithmes.
 
----
 
 ## Conclusion
 
