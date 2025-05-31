@@ -7,38 +7,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Membre {
-    public static final String FICHIER_MEMBRES = "ressources_appli/membres_APPLI.txt";
-    private String pseudo;
-    private String ville;
 
-    public Membre(String pseudo, String ville) {
-        this.pseudo = pseudo;
-        this.ville = ville;
-    }
+    public static final String CHEMIN_PAR_DEFAUT = "ressources_appli/membres_APPLI.txt";
 
-    public String getPseudo() {
-        return pseudo;
-    }
-
-    public String getVille() {
-        return ville;
-    }
-
-    @Override
-    public String toString() {
-        return pseudo + " (" + ville + ")";
-    }
-
-    public static Map<String, String> chargerDepuisFichier() throws IOException {
+    /**
+     * Charge le fichier de membres et retourne une map pseudo → ville.
+     */
+    public static Map<String, String> chargerDepuisFichier(String chemin) throws IOException {
         Map<String, String> map = new HashMap<>();
-        BufferedReader reader = new BufferedReader(new FileReader(FICHIER_MEMBRES));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String[] parts = line.split(" ");
-            map.put(parts[0], parts[1]);
+        try (BufferedReader reader = new BufferedReader(new FileReader(chemin))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length == 2) {
+                    map.put(parts[0], parts[1]);
+                }
+            }
         }
-        reader.close();
         return map;
     }
 
+    /**
+     * Variante avec chemin par défaut.
+     */
+    public static Map<String, String> chargerDepuisFichier() throws IOException {
+        return chargerDepuisFichier(CHEMIN_PAR_DEFAUT);
+    }
 }

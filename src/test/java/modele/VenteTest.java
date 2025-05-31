@@ -19,8 +19,8 @@ public class VenteTest {
     public void testVenteCreation() {
         Vente v = new Vente("Salamèche", "Carapuce");
 
-        assertEquals("Salamèche", v.getVendeur());
-        assertEquals("Carapuce", v.getAcheteur());
+        assertEquals("Salamèche", v.getVilleVendeur());
+        assertEquals("Carapuce", v.getVilleAcheteur());
     }
 
     @Test

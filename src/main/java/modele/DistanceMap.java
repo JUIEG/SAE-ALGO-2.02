@@ -3,14 +3,13 @@ package modele;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DistanceMap {
-    public static final String FICHIER_DISTANCES = "ressources_appli/distances.txt";
-    private Map<String, Map<String, Integer>> distances = new HashMap<>();
+
+    public static final String CHEMIN_PAR_DEFAUT = "ressources_appli/distances.txt";
+
+    private final Map<String, Map<String, Integer>> distances = new HashMap<>();
 
     public void addDistance(String from, String to, int distance) {
         distances.computeIfAbsent(from, k -> new HashMap<>()).put(to, distance);
@@ -18,29 +17,22 @@ public class DistanceMap {
 
     public int getDistance(String from, String to) {
         if (!distances.containsKey(from) || !distances.get(from).containsKey(to)) {
-            System.err.println("Distance inconnue entre " + from + " et " + to);
+            System.err.println("⚠️ Distance inconnue entre " + from + " et " + to);
             return Integer.MAX_VALUE;
         }
         return distances.get(from).get(to);
     }
 
-    public Map<String, Integer> getNeighbours(String from) {
-        return distances.getOrDefault(from, new HashMap<>());
-    }
-
-    public boolean hasCity(String city) {
-        return distances.containsKey(city);
-    }
-
-    public static DistanceMap chargerDepuisFichier() throws IOException {
+    public static DistanceMap chargerDepuisFichier(String chemin) throws IOException {
         DistanceMap distMap = new DistanceMap();
         List<String> lignes = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new FileReader(FICHIER_DISTANCES));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            lignes.add(line);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(chemin))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lignes.add(line);
+            }
         }
-        reader.close();
 
         List<String> villes = new ArrayList<>();
         for (String l : lignes) {
@@ -60,4 +52,7 @@ public class DistanceMap {
         return distMap;
     }
 
+    public static DistanceMap chargerDepuisFichier() throws IOException {
+        return chargerDepuisFichier(CHEMIN_PAR_DEFAUT);
+    }
 }
