@@ -62,4 +62,3 @@ Cette classe centralise la gestion des données, permettant d’isoler la lectur
 
 Ce projet combine la gestion de données relationnelles avec des contraintes de précédence et un problème d’optimisation classique (parcours du voyageur). L’utilisation de la programmation récursive et des structures comme `PriorityQueue` permet d’obtenir efficacement les meilleurs parcours valides. La modularité des classes facilite l’évolution du projet pour intégrer d’autres algorithmes ou d’autres contraintes.
 
--
