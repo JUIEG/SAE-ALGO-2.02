@@ -4,34 +4,31 @@ import java.util.*;
 
 public class AlgoBase {
 
-    public static List<String> calculerItineraire(List<Vente> ventes, Map<String, String> pseudoToVille) {
+    public static List<String> calculerItineraire(List<Vente> ventes) {
         Set<String> villes = new HashSet<>();
         Map<String, Set<String>> graph = new HashMap<>();
         Map<String, Integer> inDegree = new HashMap<>();
 
         for (Vente v : ventes) {
-            String vendeur = pseudoToVille.get(v.getVendeur());
-            String acheteur = pseudoToVille.get(v.getAcheteur());
-            villes.add(vendeur);
-            villes.add(acheteur);
+            villes.add(v.getVilleVendeur());
+            villes.add(v.getVilleAcheteur());
         }
 
         for (String ville : villes) {
-            String collect = ville + "+";
-            String deliver = ville + "-";
+            String collecte = ville + "+";
+            String livraison = ville + "-";
+            addEdge(graph, collecte, livraison);
+            addEdge(graph, "Velizy+", collecte);
+            addEdge(graph, livraison, "Velizy-");
 
-            addEdge(graph, collect, deliver);
-            addEdge(graph, "Velizy+", collect);
-            addEdge(graph, deliver, "Velizy-");
-
-            inDegree.putIfAbsent(collect, 0);
-            inDegree.putIfAbsent(deliver, 0);
+            inDegree.putIfAbsent(collecte, 0);
+            inDegree.putIfAbsent(livraison, 0);
         }
 
         for (Vente v : ventes) {
-            String vendeur = pseudoToVille.get(v.getVendeur()) + "+";
-            String acheteur = pseudoToVille.get(v.getAcheteur()) + "-";
-            addEdge(graph, vendeur, acheteur);
+            String from = v.getVilleVendeur() + "+";
+            String to = v.getVilleAcheteur() + "-";
+            addEdge(graph, from, to);
         }
 
         for (String from : graph.keySet()) {
@@ -40,13 +37,11 @@ public class AlgoBase {
             }
         }
 
+        Queue<String> queue = new PriorityQueue<>();
+        queue.add("Velizy+");
+
         List<String> ordre = new ArrayList<>();
         Set<String> visited = new HashSet<>();
-        Set<String> enFile = new HashSet<>();
-
-        PriorityQueue<String> queue = new PriorityQueue<>();
-        queue.add("Velizy+");
-        enFile.add("Velizy+");
 
         while (!queue.isEmpty()) {
             String current = queue.poll();
@@ -56,9 +51,8 @@ public class AlgoBase {
 
             for (String next : graph.getOrDefault(current, Set.of())) {
                 inDegree.put(next, inDegree.get(next) - 1);
-                if (inDegree.get(next) == 0 && !enFile.contains(next)) {
+                if (inDegree.get(next) == 0 && !visited.contains(next)) {
                     queue.add(next);
-                    enFile.add(next);
                 }
             }
         }
@@ -67,7 +61,6 @@ public class AlgoBase {
 
         List<String> parcours = new ArrayList<>();
         String lastVille = null;
-
         for (String action : ordre) {
             String ville = action.replace("+", "").replace("-", "");
             if (!ville.equals(lastVille)) {
