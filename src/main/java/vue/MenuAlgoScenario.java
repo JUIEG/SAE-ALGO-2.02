@@ -4,6 +4,13 @@ import controleur.ControleurAppli;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import modele.Util;
+import modele.Vente;
+import modele.DistanceMap;
+import modele.AlgoHeuristique;
+import modele.AlgoBase;
+import modele.AlgoKpossibilite;
+
 
 public class MenuAlgoScenario extends HBox {
 
@@ -11,6 +18,7 @@ public class MenuAlgoScenario extends HBox {
     private final ComboBox<String> algoCombo = new ComboBox<>();
     private final ComboBox<String> methodeGreedyCombo = new ComboBox<>();
     private final TextField kField = new TextField();
+    private final Button valider = new Button("Valider");  // ✅ ajout ici
 
     public MenuAlgoScenario() {
         this.setSpacing(10);
@@ -30,6 +38,7 @@ public class MenuAlgoScenario extends HBox {
                 "5 - Ville la moins visitée"
         );
         methodeGreedyCombo.setPromptText("Méthode greedy");
+        methodeGreedyCombo.setVisible(false);
 
         kField.setPromptText("k possibilités");
         kField.setVisible(false);
@@ -40,16 +49,15 @@ public class MenuAlgoScenario extends HBox {
             kField.setVisible("K possibilités".equals(selected));
         });
 
-        Button valider = new Button("Valider");
         valider.setId("Valider");
-
-        valider.setOnAction(new ControleurAppli());
 
         this.getChildren().addAll(scenarioCombo, algoCombo, methodeGreedyCombo, kField, valider);
     }
 
-    public String getScenario() {return scenarioCombo.getValue();}
-    public String getAlgo() {return algoCombo.getValue();}
-    public String getGreedyIndex(){return methodeGreedyCombo.getValue();}
-    public String getK() {return kField.getText();}
+    public String getScenario() { return scenarioCombo.getValue(); }
+    public String getAlgo() { return algoCombo.getValue(); }
+    public String getGreedyIndex() { return methodeGreedyCombo.getValue(); }
+    public String getK() { return kField.getText(); }
+
+    public Button getBoutonValider() { return valider; }  // ✅ ajout de cette méthode
 }

@@ -1,49 +1,68 @@
 package controleur;
+import modele.AlgoHeuristique;
+import modele.AlgoBase;
+import modele.AlgoKpossibilite;
+import modele.DistanceMap;
+import modele.Util;
+import modele.Vente;
 
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import modele.*;
+import org.controlsfx.control.action.Action;
 import vue.*;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ControleurAppli implements EventHandler{
+public class ControleurAppli implements EventHandler<ActionEvent> {
+    private final MenuAlgoScenario menu;
+    private final VBoxParcours parcours;
+    private final HBoxResultat resultat;
+    private final AffichageChemin chemin;
+
+    public ControleurAppli(MenuAlgoScenario menu, VBoxParcours parcours,
+                           HBoxResultat resultat, AffichageChemin chemin) {
+        this.menu = menu;
+        this.parcours = parcours;
+        this.resultat = resultat;
+        this.chemin = chemin;
+    }
+
     @Override
-    public void handle(Event event) {
-        VBoxRoot vboxroot = VBoxRoot.getInstance();
-        VBoxParcours parcours = VBoxRoot.getVBoxParcours();
-        HBoxResultat resultat = VBoxRoot.getResultat();
-        AffichageChemin chemin = VBoxRoot.getAffichage();
-        MenuAlgoScenario menue = VBoxRoot.getMenu();
+    public void handle(ActionEvent event) {
+        System.out.println("✅ Bouton cliqué : action reçue !");
 
         if (event.getSource() instanceof Button && ((Button) event.getSource()).getId().equals("Valider")) {
-
             try {
-                Map<String, String> pseudoToVille = Util.chargerMembres("ressources_appli/membres_APPLI.txt");
-                List<Vente> ventes = Util.chargerVentes("scenarios/" + menue.getScenario() + ".txt");
-                DistanceMap distances = Util.chargerDistances("ressources_appli/distances.txt");
+                Map<String, String> pseudoToVille = Membre.chargerDepuisFichier();
+                List<Vente> ventes = Vente.traduireVilles(Vente.chargerDepuisFichier("scenarios/" + menu.getScenario() + ".txt"), pseudoToVille);
+                DistanceMap distances = DistanceMap.chargerDepuisFichier();
 
                 List<String> meilleurParcours = new ArrayList<>();
                 int distance = 0;
 
-                if ("Algo de base".equals(menue.getAlgo())) {
-                    meilleurParcours = AlgoBase.calculerItineraire(ventes, pseudoToVille);
-                } else if ("Algo heuristique".equals(menue.getAlgo())) {
-                    String greedy = menue.getGreedyIndex();
-                    String[] greedysplit = greedy.split(" ");
-                    int greedyInt = Integer.parseInt(greedysplit[0]);
-
-                    meilleurParcours = AlgoHeuristique.calculerItineraire(ventes, pseudoToVille, distances, greedyInt);
-                } else if ("K possibilités".equals(menue.getAlgo())) {
-                    int k = Integer.parseInt(menue.getK());
-                    List<List<String>> parcoursList = AlgoKpossibilite.trouverKParcours(ventes, pseudoToVille, distances, k);
-                    if (!parcoursList.isEmpty()) {
-                        meilleurParcours = parcoursList.get(0);
-                    }
+                switch (menu.getAlgo()) {
+                    case "Algo de base":
+                        meilleurParcours = AlgoBase.calculerItineraire(ventes);
+//                      meilleurParcours = AlgoBase.calculerItineraire(ventes, pseudoToVille);
+                        break;
+                    case "Algo heuristique":
+                        meilleurParcours = AlgoBase.calculerItineraire(ventes);
+//                      meilleurParcours = AlgoHeuristique.calculerItineraire(ventes, pseudoToVille, distances);
+                        break;
+                    case "K possibilités":
+                        int k = Integer.parseInt(menu.getK());
+                        List<List<String>> parcoursList = AlgoKpossibilite.trouverKParcours(ventes, pseudoToVille, distances, k);
+                        if (!parcoursList.isEmpty()) {
+                            meilleurParcours = parcoursList.get(0);
+                        }
+                        break;
                 }
 
                 distance = Util.calculerDistance(meilleurParcours, distances);
@@ -64,6 +83,5 @@ public class ControleurAppli implements EventHandler{
                 ex.printStackTrace();
             }
         }
-
     }
 }

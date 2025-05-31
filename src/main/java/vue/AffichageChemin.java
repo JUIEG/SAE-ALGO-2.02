@@ -24,7 +24,6 @@ public class AffichageChemin extends VBox {
         this.getChildren().add(table);
     }
 
-    // Classe interne pour représenter une ligne
     public static class Ligne {
         private final int index;
         private final String ville;

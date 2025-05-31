@@ -17,8 +17,8 @@ public class AlgoKpossibilite {
         Set<String> villes = new HashSet<>();
         List<Vente> contraintes = new ArrayList<>();
         for (Vente v : ventes) {
-            String vendeur = pseudoToVille.get(v.getVendeur());
-            String acheteur = pseudoToVille.get(v.getAcheteur());
+            String vendeur = pseudoToVille.get(v.getVilleVendeur());
+            String acheteur = pseudoToVille.get(v.getVilleAcheteur());
             villes.add(vendeur);
             villes.add(acheteur);
             contraintes.add(new Vente(vendeur, acheteur));
@@ -51,7 +51,7 @@ public class AlgoKpossibilite {
             Set<String> dejaPassees = new HashSet<>(chemin);
             boolean ok = true;
             for (Vente v : contraintes) {
-                if (chemin.indexOf(v.getVendeur()) > chemin.indexOf(v.getAcheteur())) {
+                if (chemin.indexOf(v.getVilleVendeur()) > chemin.indexOf(v.getVilleAcheteur())) {
                     ok = false;
                     break;
                 }
@@ -76,7 +76,7 @@ public class AlgoKpossibilite {
             if (!ville.equals(villeActuelle)) {
                 boolean admissible = true;
                 for (Vente v : contraintes) {
-                    if (v.getAcheteur().equals(ville) && !visitees.contains(v.getVendeur())) {
+                    if (v.getVilleAcheteur().equals(ville) && !visitees.contains(v.getVilleVendeur())) {
                         admissible = false;
                         break;
                     }

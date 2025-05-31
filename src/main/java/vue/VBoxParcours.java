@@ -19,7 +19,6 @@ public class VBoxParcours extends VBox {
         this.getChildren().addAll(listeParcours, distanceTotal);
     }
 
-    // Méthodes pour mettre à jour l'affichage
     public void setParcours(java.util.List<String> parcours) {
         listeParcours.getItems().setAll(parcours);
     }

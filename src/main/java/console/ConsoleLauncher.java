@@ -1,6 +1,9 @@
 package console;
 
-import modele.*;
+import modele.AlgoBase;
+import modele.AlgoHeuristique;
+import modele.DistanceMap;
+import modele.Vente;
 
 import java.io.*;
 import java.util.*;
@@ -18,12 +21,11 @@ public class ConsoleLauncher {
         System.out.println("Choisissez l'algorithme à exécuter :");
         System.out.println("1 - Algo de base");
         System.out.println("2 - Algo heuristique");
-        System.out.println("3 - Algo k possibilités");
         System.out.print("Votre choix : ");
         int algoChoisi = scanner.nextInt();
         scanner.nextLine(); // consomme le retour à la ligne
 
-        // Liste des scénarios
+        // Liste les scénarios disponibles
         File dossierScenarios = new File(REPERTOIRE_SCENARIOS);
         File[] fichiers = dossierScenarios.listFiles((dir, name) -> name.endsWith(".txt"));
         if (fichiers == null || fichiers.length == 0) {
@@ -47,75 +49,41 @@ public class ConsoleLauncher {
 
         String nomFichier = fichiers[choix].getName();
 
-        // Méthode greedy si algo heuristique
-        int methodeGreedy = 1;
-        if (algoChoisi == 2) {
-            System.out.println("\nMéthodes greedy disponibles :");
-            System.out.println("1 - Ville la plus proche");
-            System.out.println("2 - Ville la plus éloignée");
-            System.out.println("3 - Ordre alphabétique");
-            System.out.println("4 - Ville débloquant le plus de dépendances");
-            System.out.println("5 - Ville la moins visitée historiquement");
-            System.out.print("Votre choix : ");
-            methodeGreedy = scanner.nextInt();
-            scanner.nextLine();
-        }
-
-        // Nombre de parcours pour k possibilités
-        int k = 1;
-        if (algoChoisi == 3) {
-            System.out.print("Combien de parcours voulez-vous générer (k) ? ");
-            k = scanner.nextInt();
-            scanner.nextLine();
-        }
-
         // Chargement des données
         Map<String, String> pseudoToVille = chargerMembres(FICHIER_MEMBRES);
         List<Vente> ventes = chargerVentes(REPERTOIRE_SCENARIOS + nomFichier);
         DistanceMap distances = chargerDistances(FICHIER_DISTANCES);
 
-        if (algoChoisi == 3) {
-            List<List<String>> topK = AlgoKpossibilite.trouverKParcours(ventes, pseudoToVille, distances, k);
-            System.out.println("\nAlgorithme utilisé : Algo k possibilités");
-            for (int i = 0; i < topK.size(); i++) {
-                List<String> parcours = topK.get(i);
-                int total = calculerDistance(parcours, distances);
-                System.out.println("Parcours #" + (i + 1) + " (" + total + " km) :");
-                for (String ville : parcours) {
-                    System.out.println(" - " + ville);
-                }
-                System.out.println();
-            }
+        // Calcul de l’itinéraire selon l’algo choisi
+        List<String> parcours;
+        String nomAlgo;
+
+        if (algoChoisi == 1) {
+            parcours = AlgoBase.calculerItineraire(ventes);
+            nomAlgo = "Algorithme de base";
         } else {
-            List<String> parcours;
-            String nomAlgo;
+            int methodeGreedy = 1;
+            parcours = AlgoHeuristique.calculerItineraire(ventes, distances, methodeGreedy);
 
-            if (algoChoisi == 1) {
-                parcours = AlgoBase.calculerItineraire(ventes, pseudoToVille);
-                nomAlgo = "Algorithme de base";
-            } else {
-                parcours = AlgoHeuristique.calculerItineraire(ventes, pseudoToVille, distances, methodeGreedy);
-                nomAlgo = "Algorithme heuristique";
-            }
-
-            int total = calculerDistance(parcours, distances);
-
-            System.out.println("\nAlgorithme utilisé : " + nomAlgo);
-            System.out.println("Itinéraire généré :");
-            for (String ville : parcours) {
-                System.out.println(" - " + ville);
-            }
-
-            System.out.println("\nDistance totale : " + total + " km");
+            nomAlgo = "Algorithme heuristique";
         }
-    }
 
-    private static int calculerDistance(List<String> parcours, DistanceMap distances) {
+        // Calcul de la distance totale
         int total = 0;
         for (int i = 0; i < parcours.size() - 1; i++) {
-            total += distances.getDistance(parcours.get(i), parcours.get(i + 1));
+            String from = parcours.get(i);
+            String to = parcours.get(i + 1);
+            total += distances.getDistance(from, to);
         }
-        return total;
+
+        // Affichage du résultat
+        System.out.println("\nAlgorithme utilisé : " + nomAlgo);
+        System.out.println("Itinéraire généré :");
+        for (String ville : parcours) {
+            System.out.println(" - " + ville);
+        }
+
+        System.out.println("\nDistance totale : " + total + " km");
     }
 
     private static Map<String, String> chargerMembres(String chemin) throws IOException {
@@ -157,8 +125,8 @@ public class ConsoleLauncher {
             villes.add(l.split("\\s+")[0]);
         }
 
-        for (int i = 0; i < lignes.size(); i++) {
-            String[] parts = lignes.get(i).trim().split("\\s+");
+        for (String ligne : lignes) {
+            String[] parts = ligne.trim().split("\\s+");
             String villeA = parts[0];
             for (int j = 1; j < parts.length; j++) {
                 String villeB = villes.get(j - 1);
