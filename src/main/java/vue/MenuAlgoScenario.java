@@ -1,15 +1,8 @@
 package vue;
 
-import controleur.ControleurAppli;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import modele.Util;
-import modele.Vente;
-import modele.DistanceMap;
-import modele.AlgoHeuristique;
-import modele.AlgoBase;
-import modele.AlgoKpossibilite;
 
 
 public class MenuAlgoScenario extends HBox {

@@ -39,12 +39,6 @@ La classe `AlgoKpossibilite` implémente la recherche des k meilleurs parcours v
 - Le parcours utilise un ensemble `visited` pour éviter les visites répétées de villes.
 - Les contraintes sont vérifiées à chaque étape pour garantir la validité du chemin.
 
-
-
-### Classe Util
-
-La classe `Util` fournit des méthodes utilitaires pour charger les données depuis des fichiers et calculer des distances.
-
 #### Méthodes
 
 - `chargerMembres(String chemin)` : charge une map pseudo → ville à partir d’un fichier texte.

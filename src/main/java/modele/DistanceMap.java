@@ -55,4 +55,12 @@ public class DistanceMap {
     public static DistanceMap chargerDepuisFichier() throws IOException {
         return chargerDepuisFichier(CHEMIN_PAR_DEFAUT);
     }
+
+    public static int calculerDistance(List<String> parcours, DistanceMap distances) {
+        int total = 0;
+        for (int i = 0; i < parcours.size() - 1; i++) {
+            total += distances.getDistance(parcours.get(i), parcours.get(i + 1));
+        }
+        return total;
+    }
 }

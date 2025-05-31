@@ -1,17 +1,13 @@
 package controleur;
-import modele.AlgoHeuristique;
 import modele.AlgoBase;
 import modele.AlgoKpossibilite;
 import modele.DistanceMap;
-import modele.Util;
 import modele.Vente;
 
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import modele.*;
-import org.controlsfx.control.action.Action;
 import vue.*;
 
 
@@ -65,7 +61,7 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
                         break;
                 }
 
-                distance = Util.calculerDistance(meilleurParcours, distances);
+                distance = DistanceMap.calculerDistance(meilleurParcours, distances);
                 parcours.setParcours(meilleurParcours);
                 parcours.setDistance(distance);
 
