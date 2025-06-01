@@ -9,31 +9,22 @@ import javafx.scene.layout.HBox;
 
 import java.io.File;
 
-/**
- * MenuAlgoScenario est une interface utilisateur JavaFX permettant
- * de sélectionner un scénario, un algorithme, une méthode greedy
- * ou un nombre k de possibilités. Lorsqu'une sélection valide est faite,
- * le contrôleur déclenche automatiquement l'exécution.
- */
 public class MenuAlgoScenario extends HBox {
 
-    // Composants de l'interface
     private final ComboBox<String> scenarioCombo = new ComboBox<>();
     private final ComboBox<String> algoCombo = new ComboBox<>();
     private final ComboBox<String> methodeGreedyCombo = new ComboBox<>();
     private final TextField kField = new TextField();
+    private final Button boutonValider = new Button("Valider");
 
-    private ControleurAppli controleur; // Contrôleur principal pour exécuter la logique métier
 
-    /**
-     * Constructeur qui initialise le menu de sélection avec ses composants,
-     * leurs valeurs possibles et leurs comportements.
-     */
+    private ControleurAppli controleur; // ✅ pour déclencher l'exécution
+
     public MenuAlgoScenario() {
         this.setSpacing(10);
         this.setPadding(new Insets(10));
 
-        // Chargement dynamique des scénarios depuis le dossier /scenarios
+        // Remplissage des scénarios
         File folder = new File("scenarios");
         File[] files = folder.listFiles((dir, name) -> name.startsWith("scenario_") && name.endsWith(".txt"));
         if (files != null) {
@@ -43,12 +34,12 @@ public class MenuAlgoScenario extends HBox {
         }
         scenarioCombo.setPromptText("Scénarios");
 
-        // Liste des algorithmes disponibles
+        // Ajout des algorithmes
         algoCombo.getItems().addAll("Algo de base", "Algo heuristique", "K possibilités");
         algoCombo.setPromptText("Algorithme");
-        algoCombo.getSelectionModel().selectFirst(); // Par défaut
+        algoCombo.getSelectionModel().selectFirst();
 
-        // Méthodes heuristiques disponibles
+        // Méthodes greedy
         methodeGreedyCombo.getItems().addAll(
                 "1 - Ville la plus proche",
                 "2 - Ville la plus éloignée",
@@ -57,24 +48,23 @@ public class MenuAlgoScenario extends HBox {
                 "5 - Ville la moins visitée"
         );
         methodeGreedyCombo.setPromptText("Méthode greedy");
-        methodeGreedyCombo.setVisible(false); // Cachée sauf pour algo heuristique
+        methodeGreedyCombo.setVisible(false);
 
-        // Champ pour le nombre de possibilités (k)
         kField.setPromptText("k possibilités");
-        kField.setVisible(false); // Caché sauf pour K possibilités
+        kField.setVisible(false);
 
-        // Gestion de la visibilité selon l'algorithme sélectionné
+        // Gestion visibilité + vérification
         algoCombo.setOnAction(e -> {
             String selected = algoCombo.getValue();
             methodeGreedyCombo.setVisible("Algo heuristique".equals(selected));
             kField.setVisible("K possibilités".equals(selected));
-            verifierEtExecuter(); // Re-vérifie à chaque changement
+            verifierEtExecuter(); // 🔄 après changement
         });
 
-        // Ajout des éléments graphiques au layout
-        this.getChildren().addAll(scenarioCombo, algoCombo, methodeGreedyCombo, kField);
+        // Ajout au layout
+        this.getChildren().addAll(scenarioCombo, algoCombo, methodeGreedyCombo, kField, boutonValider); // ✅
 
-        // Listener commun à tous les champs pour détecter les changements
+        // Ecouteurs pour tous les champs
         ChangeListener<Object> listener = (obs, oldVal, newVal) -> verifierEtExecuter();
         scenarioCombo.valueProperty().addListener(listener);
         algoCombo.valueProperty().addListener(listener);
@@ -82,71 +72,39 @@ public class MenuAlgoScenario extends HBox {
         kField.textProperty().addListener(listener);
     }
 
-    /**
-     * Associe un contrôleur à ce menu pour exécuter l'application
-     * @param controleur le contrôleur de l'application
-     */
     public void setControleur(ControleurAppli controleur) {
         this.controleur = controleur;
     }
 
-    /**
-     * Vérifie si tous les champs nécessaires sont valides selon
-     * l'algorithme sélectionné, puis déclenche le contrôleur.
-     */
     private void verifierEtExecuter() {
         String algo = getAlgo();
-
-        // Conditions générales
         if (getScenario() == null || getScenario().isEmpty()) return;
         if (algo == null || algo.isEmpty()) return;
 
-        // Si l'algo heuristique est sélectionné, vérifier la méthode greedy
         if (algo.equals("Algo heuristique")) {
             if (getMethodeGreedy() == null || getMethodeGreedy().isEmpty()) return;
         }
 
-        // Si l'algo K possibilités est sélectionné, vérifier que k est un entier
         if (algo.equals("K possibilités")) {
             if (getK() == null || getK().isEmpty()) return;
             try {
                 Integer.parseInt(getK());
             } catch (NumberFormatException e) {
-                return; // k non valide
+                return;
             }
         }
 
-        // Si tout est bon, on déclenche l'exécution via le contrôleur
         if (controleur != null) {
             controleur.execute();
         }
     }
 
-    /**
-     * @return le nom du scénario sélectionné (sans .txt)
-     */
-    public String getScenario() {
-        return scenarioCombo.getValue();
-    }
-
-    /**
-     * @return le nom de l'algorithme sélectionné
-     */
-    public String getAlgo() {
-        return algoCombo.getValue();
-    }
-
-    /**
-     * @return la méthode greedy sélectionnée (si applicable)
-     */
-    public String getMethodeGreedy() {
-        return methodeGreedyCombo.getValue();
-    }
-
-    /**
-     * @return le nombre k de possibilités entré par l'utilisateur (si applicable)
-     */
-    public String getK() {
-        return kField.getText();
+    public String getScenario() { return scenarioCombo.getValue(); }
+    public String getAlgo() { return algoCombo.getValue(); }
+    public String getMethodeGreedy() { return methodeGreedyCombo.getValue(); }
+    public String getK() { return kField.getText(); }
+    public Button getBoutonValider() {
+        return boutonValider;
     }
 }
+
