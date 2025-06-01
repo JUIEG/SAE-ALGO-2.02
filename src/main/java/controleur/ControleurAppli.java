@@ -2,9 +2,14 @@ package controleur;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import modele.*;
-import vue.*;
+import modele.usage.AlgoBase;
+import modele.usage.AlgoHeuristique;
+import modele.usage.AlgoKpossibilite;
+import vue.usage.AffichageChemin;
+import vue.usage.HBoxResultat;
+import vue.usage.MenuAlgoScenario;
+import vue.usage.VBoxParcours;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,11 +101,9 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
                         chemin.setChemin(lignes);
 
                     } else {
-                        System.out.println("❌ Aucun parcours valide trouvé.");
+                        System.out.println("❌ Aucun parcours valide trouvé. (Controleur)");
                         return;
                     }
-
-
                 default:
                     System.out.println("❌ Algorithme non reconnu.");
                     return;

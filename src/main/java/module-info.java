@@ -8,4 +8,7 @@ module vue {
     exports vue;
     exports modele;
     exports console;
+    exports vue.usage;
+    opens vue.usage to javafx.fxml;
+    exports modele.usage;
 }

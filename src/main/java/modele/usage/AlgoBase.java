@@ -1,4 +1,6 @@
-package modele;
+package modele.usage;
+
+import modele.Vente;
 
 import java.util.*;
 /**

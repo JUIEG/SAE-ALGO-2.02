@@ -1,7 +1,7 @@
 package console;
 
-import modele.AlgoBase;
-import modele.AlgoHeuristique;
+import modele.usage.AlgoBase;
+import modele.usage.AlgoHeuristique;
 import modele.DistanceMap;
 import modele.Vente;
 

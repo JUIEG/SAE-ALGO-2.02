@@ -1,4 +1,7 @@
-package modele;
+package modele.usage;
+
+import modele.DistanceMap;
+import modele.Vente;
 
 import java.util.*;
 

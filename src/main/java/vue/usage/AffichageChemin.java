@@ -1,4 +1,4 @@
-package vue;
+package vue.usage;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;

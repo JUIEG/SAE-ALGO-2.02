@@ -1,8 +1,7 @@
-package vue;
+package vue.usage;
 
 import controleur.ControleurAppli;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;

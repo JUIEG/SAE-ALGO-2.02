@@ -1,4 +1,4 @@
-package vue;
+package vue.usage;
 
 import controleur.ControleurAppli;
 import javafx.scene.layout.VBox;

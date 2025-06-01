@@ -1,4 +1,4 @@
-package vue;
+package vue.usage;
 
 import javafx.scene.layout.HBox;
 
