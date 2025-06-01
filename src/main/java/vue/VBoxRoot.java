@@ -26,7 +26,7 @@ public class VBoxRoot extends VBox {
 
         controleur = new ControleurAppli(menu, vBoxParcours, resultat, affichage);
 
-        menu.getBoutonValider().setOnAction(controleur);
+        menu.setControleur(controleur);
 
         // Affichage
         this.setSpacing(10);
