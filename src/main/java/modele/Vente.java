@@ -3,7 +3,7 @@ package modele;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+
 
 public class Vente {
     private String vendeur;
@@ -63,7 +63,7 @@ public class Vente {
             if (villeVendeur != null && villeAcheteur != null) {
                 traduites.add(new Vente(villeVendeur, villeAcheteur));
             } else {
-                System.err.println("⚠️ Pseudo inconnu : " + v.vendeur + " ou " + v.acheteur);
+                System.err.println("Pseudo inconnu : " + v.vendeur + " ou " + v.acheteur);
             }
         }
         return traduites;
