@@ -63,4 +63,7 @@ public class DistanceMap {
         }
         return total;
     }
+    public Map<String, Integer> getNeighbours(String from) {
+        return distances.getOrDefault(from, new HashMap<>());
+    }
 }
