@@ -127,7 +127,6 @@ L’application suit le modèle **MVC** (Modèle - Vue - Contrôleur) :
 - **Fichiers CSS** : le répertoire `/css` contient le fichier `style.css` utilisé pour la mise en forme de l’interface JavaFX.
 - **Tests unitaires** : présents dans le dossier `/tests` 
 - **Dépôt Git** :  
-  [https://github.com/tonPseudo/APPLI](https://github.com/tonPseudo/APPLI)
-
+https://github.com/JUIEG/SAE-ALGO-2.02.git
 
 
