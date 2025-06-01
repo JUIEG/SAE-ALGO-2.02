@@ -5,8 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-
-
 public class Vente {
     private String vendeur;
     private String acheteur;
@@ -65,9 +63,19 @@ public class Vente {
             if (villeVendeur != null && villeAcheteur != null) {
                 traduites.add(new Vente(villeVendeur, villeAcheteur));
             } else {
-                System.err.println("Pseudo inconnu : " + v.vendeur + " ou " + v.acheteur);
+                System.err.println(" Pseudo inconnu : " + v.vendeur + " ou " + v.acheteur);
             }
         }
         return traduites;
     }
+    // Getter pour le pseudo du vendeur
+    public String getVendeur() {
+        return vendeur;
+    }
+
+    // Getter pour le pseudo de l'acheteur
+    public String getAcheteur() {
+        return acheteur;
+    }
+
 }
