@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 /**
  * Classe principale de l'application JavaFX d'optimisation de parcours.
  * Elle initialise et affiche la fenêtre principale.
@@ -18,7 +20,7 @@ public class APPLI extends Application {
 
         Scene scene = new Scene(root, 800, 600);
 
-        scene.getStylesheets().add("file:src/css/style.css");
+        scene.getStylesheets().add(new File("css/style.css").toURI().toString());
 
         stage.setScene(scene);
         stage.setTitle("Optimisation de Parcours");
@@ -30,4 +32,3 @@ public class APPLI extends Application {
     }
 }
 
-}
