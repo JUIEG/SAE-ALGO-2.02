@@ -3,9 +3,6 @@ package vue;
 import controleur.ControleurAppli;
 import javafx.scene.layout.VBox;
 
-import controleur.ControleurAppli;
-import javafx.scene.layout.VBox;
-
 public class VBoxRoot extends VBox {
     private static VBoxRoot instance;
 
@@ -57,3 +54,4 @@ public class VBoxRoot extends VBox {
         return instance.controleur;
     }
 }
+
