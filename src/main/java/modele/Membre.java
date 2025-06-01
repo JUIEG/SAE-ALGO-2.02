@@ -92,3 +92,4 @@ public class Membre {
         return chargerDepuisFichier(CHEMIN_PAR_DEFAUT);
     }
 }
+
