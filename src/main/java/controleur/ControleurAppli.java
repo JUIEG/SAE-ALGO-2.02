@@ -36,6 +36,7 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
+        System.out.println("Scenario choisi : "+menu.getScenario() + ", Algo Choisi : "+menu.getAlgo() + ", Nombre de possibilité: " + menu.getK());
 
         try {
             // Chargement des données
@@ -99,6 +100,7 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
                             lignes.add(new AffichageChemin.Ligne(i + 1, ville, dist));
                         }
                         chemin.setChemin(lignes);
+                        return;
 
                     } else {
                         System.out.println("❌ Aucun parcours valide trouvé. (Controleur)");

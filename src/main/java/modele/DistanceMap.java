@@ -6,22 +6,32 @@ import java.io.IOException;
 import java.util.*;
 
 public class DistanceMap {
+    public static String normalizeCity(String city) {
+        return city.trim().replaceAll("-", "").replaceAll(" ", "").toLowerCase();
+    }
 
     public static final String CHEMIN_PAR_DEFAUT = "ressources_appli/distances.txt";
 
     private final Map<String, Map<String, Integer>> distances = new HashMap<>();
 
     public void addDistance(String from, String to, int distance) {
-        distances.computeIfAbsent(from, k -> new HashMap<>()).put(to, distance);
+        String villeFrom = normalizeCity(from);
+        String villeTo = normalizeCity(to);
+        distances.computeIfAbsent(villeFrom, k -> new HashMap<>()).put(villeTo, distance);
     }
 
+
     public int getDistance(String from, String to) {
-        if (!distances.containsKey(from) || !distances.get(from).containsKey(to)) {
-            System.err.println("⚠️ Distance inconnue entre " + from + " et " + to);
+        String villeFrom = normalizeCity(from);
+        String villeTo = normalizeCity(to);
+
+        if (!distances.containsKey(villeFrom) || !distances.get(villeFrom).containsKey(villeTo)) {
+            System.err.println(" Distance inconnue entre " + from + " et " + to);
             return Integer.MAX_VALUE;
         }
-        return distances.get(from).get(to);
+        return distances.get(villeFrom).get(villeTo);
     }
+
 
     public static DistanceMap chargerDepuisFichier(String chemin) throws IOException {
         DistanceMap distMap = new DistanceMap();
@@ -64,6 +74,6 @@ public class DistanceMap {
         return total;
     }
     public Map<String, Integer> getNeighbours(String from) {
-        return distances.getOrDefault(from, new HashMap<>());
+        return distances.getOrDefault(normalizeCity(from), new HashMap<>());
     }
 }
