@@ -128,5 +128,3 @@ L’application suit le modèle **MVC** (Modèle - Vue - Contrôleur) :
 - **Tests unitaires** : présents dans le dossier `/tests` 
 - **Dépôt Git** :  
 https://github.com/JUIEG/SAE-ALGO-2.02.git
-
-
