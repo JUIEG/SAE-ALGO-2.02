@@ -22,6 +22,7 @@ public class APPLI extends Application {
         scene.getStylesheets().add(new File("css/style.css").toURI().toString());
 
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.setTitle("Optimisation de Parcours");
         stage.show();
     }
