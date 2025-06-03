@@ -8,12 +8,13 @@ import modele.creation.CreateScenario;
 import vue.creation.VBoxCreation;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
 public class ControleurCreation implements EventHandler<ActionEvent> {
-
     private final VBoxCreation vue;
+    // champ pour mémoriser le pseudo choisi comme 'départ'
+    private String pseudoDepartCourant = null;
+    private String selectionDepart = null;
+
 
     public ControleurCreation(VBoxCreation vue) {
         this.vue = vue;
@@ -21,7 +22,6 @@ public class ControleurCreation implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        System.out.println("Bouton intéragie  " + event.getSource());
         Object source = event.getSource();
 
         if (source instanceof Button button) {
@@ -35,26 +35,50 @@ public class ControleurCreation implements EventHandler<ActionEvent> {
         }
     }
 
-    /** Convertit les villes sélectionnées en paires vente (départ → arrivée) */
+    /** Sélection séquentielle :
+     * 1. Premier clic → on mémorise le pseudo comme « départ »
+     * 2. Deuxième clic → on vérifie qu’il est différent de « départ »,
+     *    on crée la Vente et on l’ajoute au tableau.
+     */
     private void ajouterVentesParPaires() {
-        List<String> pseudos = vue.getSelectionVerticale(); // Liste des pseudos sélectionnés
-        if (pseudos.size() < 2) {
-            System.out.println("Sélectionnez au moins deux entrées.");
+        List<String> selection = vue.getSelectionVerticale();
+        if (selection.size() != 1) {
+            System.out.println("Sélectionnez exactement un élément à chaque fois.");
+            return;
+        }
+        String pseudoSélectionné = selection.get(0);
+
+        // Si le champ 'départ' n’est pas encore rempli, on l’affecte
+        if (pseudoDepartCourant == null) {
+            pseudoDepartCourant = pseudoSélectionné;
+            System.out.println("Ville départ définie sur : " + pseudoDepartCourant);
             return;
         }
 
-        List<Vente> nouvelles = new ArrayList<>();
-        for (int i = 0; i < pseudos.size() - 1; i += 2) {
-            String pseudoDepart = pseudos.get(i);
-            String pseudoArrivee = pseudos.get(i + 1);
-            nouvelles.add(new Vente(pseudoDepart, pseudoArrivee));
+        // Sinon, on est au deuxième choix : on l’utilise comme arrivée
+        String pseudoArrivée = pseudoSélectionné;
+        // Vérification qu’on ne reprenne pas le même pseudo
+        if (pseudoArrivée.equals(pseudoDepartCourant)) {
+            System.out.println("Le pseudo de départ et d’arrivée doivent être différents.");
+            return;
         }
 
-        vue.ajouterVentes(nouvelles);
+        // Tout est bon : on crée la vente et on l’ajoute
+        Vente vente = new Vente(pseudoDepartCourant, pseudoArrivée);
+        vue.ajouterVentes(List.of(vente));
+
+        // On réinitialise pour la prochaine paire
+        pseudoDepartCourant = null;
+        System.out.println("Vente ajoutée : " + vente.getVendeur() + " → " + vente.getAcheteur());
     }
 
-    /** Crée ou modifie un scénario selon le mode */
     private void creerOuModifierScenario() {
+        // Si on est en mode modification, il faut un scénario sélectionné
+        if (!vue.isModeCreation() && !vue.isScenarioSelectionne()) {
+            System.out.println("⚠ Aucun scénario sélectionné.");
+            return;
+        }
+
         try {
             List<Vente> ventes = vue.getListeVentes();
             if (ventes.isEmpty()) {
@@ -66,8 +90,9 @@ public class ControleurCreation implements EventHandler<ActionEvent> {
                 CreateScenario.enregistrerScenario(ventes);
                 System.out.println("Nouveau scénario créé.");
             } else {
-                // TODO : implémenter l'écrasement d'un scénario existant
-                System.out.println("Mode modification non encore implémenté.");
+                int numero = vue.getNumeroScenarioActuel();
+                CreateScenario.modifierScenario(numero, ventes);
+                System.out.println("Scénario modifié.");
             }
 
             vue.reinitialiserFormulaire();
@@ -78,4 +103,8 @@ public class ControleurCreation implements EventHandler<ActionEvent> {
             System.err.println("Erreur lors de l'enregistrement : " + e.getMessage());
         }
     }
+
+
+
 }
+

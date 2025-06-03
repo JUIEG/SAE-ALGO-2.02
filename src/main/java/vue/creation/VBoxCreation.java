@@ -4,13 +4,15 @@ import controleur.ControleurCreation;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import modele.Membre;
 import modele.Vente;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+
 
 public class VBoxCreation extends VBox {
 
@@ -28,29 +30,41 @@ public class VBoxCreation extends VBox {
         this.setPadding(new Insets(10));
         this.setPrefWidth(800);
 
+        // Labels avec mnemonics pour ComboBox
+        Label labelMode = new Label("_Mode:");
+        labelMode.setMnemonicParsing(true);
+
+        Label labelScenario = new Label("_Scénario:");
+        labelScenario.setMnemonicParsing(true);
+        labelScenario.setVisible(false);
+
         // Barre supérieure
         modeCombo = new ComboBox<>();
         modeCombo.getItems().addAll("Créer un scénario", "Modifier un scénario existant");
         modeCombo.setPromptText("Choisissez un mode");
         modeCombo.getSelectionModel().selectFirst();
+        labelMode.setLabelFor(modeCombo);
 
         scenarioCombo = new ComboBox<>();
         scenarioCombo.setPromptText("Scénario à modifier");
         scenarioCombo.setVisible(false);
+        labelScenario.setLabelFor(scenarioCombo);
 
         modeCombo.setOnAction(e -> {
             boolean isModif = "Modifier un scénario existant".equals(modeCombo.getValue());
             scenarioCombo.setVisible(isModif);
+            labelScenario.setVisible(isModif);
             if (isModif) {
                 scenarioCombo.getItems().setAll(listerFichiersScenario("scenarios"));
             }
         });
 
-        btnValiderScenario = new Button("Créer / Modifier");
+        btnValiderScenario = new Button("_Créer / Modifier");
+        btnValiderScenario.setMnemonicParsing(true);
         btnValiderScenario.setId("creerScenario");
         btnValiderScenario.setOnAction(controleur);
 
-        HBox barreSuperieure = new HBox(10, modeCombo, scenarioCombo, btnValiderScenario);
+        HBox barreSuperieure = new HBox(10, labelMode, modeCombo, labelScenario, scenarioCombo, btnValiderScenario);
 
         // Tableau des ventes
         tableauVentes = new TableView<>();
@@ -65,10 +79,17 @@ public class VBoxCreation extends VBox {
 
         tableauVentes.getColumns().addAll(rangCol, colDepart, colArrivee);
         tableauVentes.setPrefWidth(300);
+        rangCol.setReorderable(false);
+        rangCol.setSortable(false);
+        colDepart.setReorderable(false);
+        colDepart.setSortable(false);
+        colArrivee.setReorderable(false);
+        colArrivee.setSortable(false);
+
 
         // Liste des membres
         listePseudoVille = new ListView<>();
-        listePseudoVille.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listePseudoVille.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         listePseudoVille.setPrefWidth(300);
         try {
             listePseudoVille.getItems().addAll(Membre.formaterPseudosAvecVille());
@@ -77,11 +98,13 @@ public class VBoxCreation extends VBox {
         }
 
         // Boutons entre les deux
-        boutonAjouterVente = new Button("←");
+        boutonAjouterVente = new Button("_←");
+        boutonAjouterVente.setMnemonicParsing(true);
         boutonAjouterVente.setId("ajouterVente");
         boutonAjouterVente.setOnAction(controleur);
 
-        boutonSupprimerVente = new Button("→");
+        boutonSupprimerVente = new Button("_→");
+        boutonSupprimerVente.setMnemonicParsing(true);
         boutonSupprimerVente.setOnAction(e -> {
             Vente selected = tableauVentes.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -96,7 +119,7 @@ public class VBoxCreation extends VBox {
         this.getChildren().addAll(barreSuperieure, contenuPrincipal);
     }
 
-    private List<String> listerFichiersScenario(String racine) {
+    public List<String> listerFichiersScenario(String racine) {
         File dossier = new File(racine);
         return parcoursFichiers(dossier, "");
     }
@@ -160,4 +183,32 @@ public class VBoxCreation extends VBox {
     public void rafraichirListeScenario() {
         scenarioCombo.getItems().setAll(listerFichiersScenario("scenarios"));
     }
+
+    public int getNumeroScenarioActuel() {
+        String nomScenario = scenarioCombo.getSelectionModel().getSelectedItem(); // par ex. "scenario_2"
+        if (nomScenario == null) {
+            throw new IllegalArgumentException("Aucun scénario sélectionné");
+        }
+
+        // Extraire le numéro à partir du nom
+        try {
+            // Supposons que le format soit "scenario_X" où X est un entier
+            String[] parts = nomScenario.split("_");
+            return Integer.parseInt(parts[1]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Nom de fichier invalide : " + nomScenario, e);
+        }
+    }
+
+    public boolean isScenarioSelectionne() {
+        return scenarioCombo.getSelectionModel().getSelectedItem() != null;
+    }
+
+    public String getNomScenarioSelectionne() {
+        return scenarioCombo.getSelectionModel().getSelectedItem();
+    }
+    public ComboBox<String> getScenarioCombo() {
+        return scenarioCombo;
+    }
+
 }
