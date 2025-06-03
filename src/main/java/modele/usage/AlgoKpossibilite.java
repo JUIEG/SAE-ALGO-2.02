@@ -29,9 +29,9 @@ public class AlgoKpossibilite {
         }
 
         if (resultats.isEmpty()) {
-            System.out.println("❌ Aucun parcours valide trouvé.");
+            System.out.println("Aucun parcours valide trouvé.");
         } else {
-            System.out.println("✅ " + resultats.size() + " parcours valides trouvés.");
+            System.out.println(resultats.size() + " parcours valides trouvés.");
         }
 
         return resultats;

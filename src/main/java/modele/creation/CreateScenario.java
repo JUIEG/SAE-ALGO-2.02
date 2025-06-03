@@ -24,7 +24,7 @@ public class CreateScenario {
             }
         }
 
-        System.out.println("✅ Fichier créé : " + fichier.getAbsolutePath());
+        System.out.println("Fichier créé : " + fichier.getAbsolutePath());
     }
 
     private static int getProchainNumero() {

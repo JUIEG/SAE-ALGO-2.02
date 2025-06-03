@@ -16,7 +16,7 @@ public class MenuAlgoScenario extends HBox {
     private final TextField kField = new TextField();
 
 
-    private ControleurAppli controleur; // ✅ pour déclencher l'exécution
+    private ControleurAppli controleur; // pour déclencher l'exécution
 
     public MenuAlgoScenario() {
         this.setSpacing(10);
@@ -56,7 +56,7 @@ public class MenuAlgoScenario extends HBox {
             String selected = algoCombo.getValue();
             methodeGreedyCombo.setVisible("Algo heuristique".equals(selected));
             kField.setVisible("K possibilités".equals(selected));
-            verifierEtExecuter(); // 🔄 après changement
+            verifierEtExecuter(); // après changement
         });
 
         // Ajout au layout

@@ -1,51 +1,58 @@
 package vue.creation;
 
+import controleur.ControleurCreation;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import modele.Membre;
 import modele.Vente;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VBoxCreation extends VBox {
 
-    private final ComboBox<String> modeCombo;           // Création ou Modification
-    private final ComboBox<String> scenarioCombo;       // Liste des scénarios si modification
-    private final Button btnValiderScenario;            // Créer/modifier le fichier
-    private final TableView<Vente> tableauVentes;       // Ventes sélectionnées
-    private final ListView<String> listePseudoVille;    // Pseudo (Ville)
+    private final ComboBox<String> modeCombo;
+    private final ComboBox<String> scenarioCombo;
+    private final Button btnValiderScenario;
+    private final TableView<Vente> tableauVentes;
+    private final ListView<String> listePseudoVille;
     private final Button boutonAjouterVente;
     private final Button boutonSupprimerVente;
 
     public VBoxCreation() {
+        ControleurCreation controleur = new ControleurCreation(this);
         this.setSpacing(10);
         this.setPadding(new Insets(10));
         this.setPrefWidth(800);
 
-        // Barre supérieure : Choix mode + scénario + validation
+        // Barre supérieure
         modeCombo = new ComboBox<>();
         modeCombo.getItems().addAll("Créer un scénario", "Modifier un scénario existant");
         modeCombo.setPromptText("Choisissez un mode");
+        modeCombo.getSelectionModel().selectFirst();
 
         scenarioCombo = new ComboBox<>();
         scenarioCombo.setPromptText("Scénario à modifier");
         scenarioCombo.setVisible(false);
 
-        // Affiche la combo des scénarios uniquement si "modifier" est sélectionné
         modeCombo.setOnAction(e -> {
-            scenarioCombo.setVisible("Modifier un scénario existant".equals(modeCombo.getValue()));
-            if (scenarioCombo.isVisible()) {
+            boolean isModif = "Modifier un scénario existant".equals(modeCombo.getValue());
+            scenarioCombo.setVisible(isModif);
+            if (isModif) {
                 scenarioCombo.getItems().setAll(listerFichiersScenario("scenarios"));
             }
         });
 
         btnValiderScenario = new Button("Créer / Modifier");
+        btnValiderScenario.setId("creerScenario");
+        btnValiderScenario.setOnAction(controleur);
 
         HBox barreSuperieure = new HBox(10, modeCombo, scenarioCombo, btnValiderScenario);
 
-        // Tableau des ventes à gauche
+        // Tableau des ventes
         tableauVentes = new TableView<>();
         TableColumn<Vente, String> rangCol = new TableColumn<>("Rang");
         rangCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(String.valueOf(tableauVentes.getItems().indexOf(c.getValue()) + 1)));
@@ -59,31 +66,22 @@ public class VBoxCreation extends VBox {
         tableauVentes.getColumns().addAll(rangCol, colDepart, colArrivee);
         tableauVentes.setPrefWidth(300);
 
-        // Liste des pseudo (ville) à droite
+        // Liste des membres
         listePseudoVille = new ListView<>();
+        listePseudoVille.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listePseudoVille.setPrefWidth(300);
-
-        // Chargement des membres
         try {
-            List<String> membres = modele.Membre.formaterPseudosAvecVille();
-            listePseudoVille.getItems().addAll(membres);
+            listePseudoVille.getItems().addAll(Membre.formaterPseudosAvecVille());
         } catch (Exception e) {
-            listePseudoVille.getItems().add("⚠️ Erreur de chargement des membres");
+            listePseudoVille.getItems().add("Erreur de chargement des membres");
         }
 
         // Boutons entre les deux
         boutonAjouterVente = new Button("←");
-        boutonSupprimerVente = new Button("➜");9
+        boutonAjouterVente.setId("ajouterVente");
+        boutonAjouterVente.setOnAction(controleur);
 
-        boutonAjouterVente.setOnAction(e -> {
-            List<String> selected = listePseudoVille.getSelectionModel().getSelectedItems();
-            if (selected.size() == 2) {
-                String depart = extraireVilleDepuisTexte(selected.get(0));
-                String arrivee = extraireVilleDepuisTexte(selected.get(1));
-                tableauVentes.getItems().add(new Vente(depart, arrivee));
-            }
-        });
-
+        boutonSupprimerVente = new Button("→");
         boutonSupprimerVente.setOnAction(e -> {
             Vente selected = tableauVentes.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -95,20 +93,16 @@ public class VBoxCreation extends VBox {
         boutonsCentre.setPadding(new Insets(40, 0, 0, 0));
 
         HBox contenuPrincipal = new HBox(10, tableauVentes, boutonsCentre, listePseudoVille);
-
         this.getChildren().addAll(barreSuperieure, contenuPrincipal);
     }
 
-    /**
-     * Récupère tous les fichiers "scenario_*.txt" dans un dossier récursivement
-     */
     private List<String> listerFichiersScenario(String racine) {
         File dossier = new File(racine);
         return parcoursFichiers(dossier, "");
     }
 
     private List<String> parcoursFichiers(File racine, String cheminRelatif) {
-        List<String> resultats = new java.util.ArrayList<>();
+        List<String> resultats = new ArrayList<>();
         File[] fichiers = racine.listFiles();
         if (fichiers != null) {
             for (File f : fichiers) {
@@ -129,23 +123,41 @@ public class VBoxCreation extends VBox {
         return texte.substring(start + 1, end);
     }
 
+    // Méthodes d'accès pour le contrôleur
+    public Button getBoutonAjouterVente() {
+        return boutonAjouterVente;
+    }
+
     public Button getBtnValiderScenario() {
         return btnValiderScenario;
     }
 
-    public List<Vente> getVentesActuelles() {
+    public List<String> getSelectionVerticale() {
+        return listePseudoVille.getSelectionModel().getSelectedItems();
+    }
+
+    public void ajouterVentes(List<Vente> nouvellesVentes) {
+        tableauVentes.getItems().addAll(nouvellesVentes);
+    }
+
+    public List<Vente> getListeVentes() {
         return tableauVentes.getItems();
     }
 
+    public boolean isModeCreation() {
+        return "Créer un scénario".equals(modeCombo.getValue());
+    }
+
     public String getNomScenario() {
-        if ("Créer un scénario".equals(modeCombo.getValue())) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Nom du scénario");
-            dialog.setHeaderText("Entrez le nom du scénario (ex: scenario_9)");
-            dialog.setContentText("Nom :");
-            return dialog.showAndWait().orElse(null);
-        } else {
-            return scenarioCombo.getValue();
-        }
+        return isModeCreation() ? null : scenarioCombo.getValue();
+    }
+
+    public void reinitialiserFormulaire() {
+        tableauVentes.getItems().clear();
+        listePseudoVille.getSelectionModel().clearSelection();
+    }
+
+    public void rafraichirListeScenario() {
+        scenarioCombo.getItems().setAll(listerFichiersScenario("scenarios"));
     }
 }

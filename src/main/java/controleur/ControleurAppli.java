@@ -60,7 +60,7 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
                 case "Algo heuristique":
                     String methodeStr = menu.getMethodeGreedy();
                     if (methodeStr == null || methodeStr.isEmpty()) {
-                        System.out.println("❌ Veuillez sélectionner une méthode heuristique.");
+                        System.out.println("Veuillez sélectionner une méthode heuristique.");
                         return;
                     }
                     int methode = Integer.parseInt(methodeStr.substring(0, 1));
@@ -70,7 +70,7 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
                 case "K possibilités":
                     String kStr = menu.getK();
                     if (kStr == null || kStr.isEmpty()) {
-                        System.out.println("❌ Veuillez renseigner une valeur pour k.");
+                        System.out.println("Veuillez renseigner une valeur pour k.");
                         return;
                     }
                     int k = Integer.parseInt(kStr);
@@ -103,11 +103,11 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
                         return;
 
                     } else {
-                        System.out.println("❌ Aucun parcours valide trouvé. (Controleur)");
+                        System.out.println("Aucun parcours valide trouvé. (Controleur)");
                         return;
                     }
                 default:
-                    System.out.println("❌ Algorithme non reconnu.");
+                    System.out.println("Algorithme non reconnu.");
                     return;
             }
 
@@ -129,7 +129,7 @@ public class ControleurAppli implements EventHandler<ActionEvent> {
 
         } catch (IOException | NumberFormatException ex) {
             ex.printStackTrace();
-            System.out.println("❌ Erreur lors du traitement : " + ex.getMessage());
+            System.out.println("Erreur lors du traitement : " + ex.getMessage());
         }
     }
 }
