@@ -2,8 +2,11 @@ package vue.usage;
 
 import controleur.ControleurAppli;
 import javafx.scene.layout.VBox;
+import vue.MenuPrincipal;
+import vue.creation.VBoxCreation;
 
 public class VBoxRoot extends VBox {
+
     private static VBoxRoot instance;
 
     private final MenuAlgoScenario menu;
@@ -12,22 +15,51 @@ public class VBoxRoot extends VBox {
     private final HBoxResultat resultat;
     private final ControleurAppli controleur;
 
+    private final MenuPrincipal menuPrincipal;
+    private final VBoxCreation creation;
+    private final VBox usage;
+
     public VBoxRoot() {
         instance = this;
+        this.setSpacing(10);
 
-        // Initialisation des composants
+        // Menu général (utilisation / création)
+        menuPrincipal = new MenuPrincipal();
+        this.getChildren().add(menuPrincipal);
+
+        // Partie "utilisation"
         menu = new MenuAlgoScenario();
         affichage = new AffichageChemin();
         vBoxParcours = new VBoxParcours();
         resultat = new HBoxResultat(affichage, vBoxParcours);
-
         controleur = new ControleurAppli(menu, vBoxParcours, resultat, affichage);
-
         menu.setControleur(controleur);
 
-        // Affichage
-        this.setSpacing(10);
-        this.getChildren().addAll(menu, resultat);
+        usage = new VBox(menu, resultat);
+
+        // Partie "création"
+        creation = new VBoxCreation();
+
+        // Affichage initial : mode utilisation
+        this.getChildren().add(usage);
+
+        // Gestion du changement de mode
+        menuPrincipal.getItemUtilisation().setOnAction(e -> basculerVersUtilisation());
+        menuPrincipal.getItemCreation().setOnAction(e -> basculerVersCreation());
+    }
+
+    private void basculerVersUtilisation() {
+        this.getChildren().remove(creation);
+        if (!this.getChildren().contains(usage)) {
+            this.getChildren().add(usage);
+        }
+    }
+
+    private void basculerVersCreation() {
+        this.getChildren().remove(usage);
+        if (!this.getChildren().contains(creation)) {
+            this.getChildren().add(creation);
+        }
     }
 
     public static VBoxRoot getInstance() {
@@ -54,4 +86,3 @@ public class VBoxRoot extends VBox {
         return instance.controleur;
     }
 }
-

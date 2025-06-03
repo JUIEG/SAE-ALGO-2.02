@@ -3,7 +3,9 @@ package modele;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,4 +93,21 @@ public class Membre {
     public static Map<String, String> chargerDepuisFichier() throws IOException {
         return chargerDepuisFichier(CHEMIN_PAR_DEFAUT);
     }
+
+    public static List<String> formaterPseudosAvecVille() throws IOException {
+        List<String> lignes = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("ressources_appli/membres_APPLI.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length == 2) {
+                    String pseudo = parts[0];
+                    String ville = parts[1];
+                    lignes.add(pseudo + " (" + ville + ")");
+                }
+            }
+        }
+        return lignes;
+    }
+
 }
